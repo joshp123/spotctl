@@ -177,6 +177,13 @@ type Playlist struct {
 	URI  string `json:"uri"`
 }
 
+type PlaylistDetails struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	URI    string `json:"uri"`
+	Public *bool  `json:"public"`
+}
+
 func (c *Client) CreatePlaylist(ctx context.Context, name string, public bool, description string) (Playlist, error) {
 	body := map[string]any{
 		"name":        name,
@@ -190,6 +197,30 @@ func (c *Client) CreatePlaylist(ctx context.Context, name string, public bool, d
 		return Playlist{}, err
 	}
 	return pl, nil
+}
+
+func (c *Client) PlaylistDetails(ctx context.Context, playlistID string) (PlaylistDetails, error) {
+	path := fmt.Sprintf("/v1/playlists/%s", url.PathEscape(playlistID))
+	var pl PlaylistDetails
+	if err := c.do(ctx, "GET", path, nil, nil, &pl, 200); err != nil {
+		return PlaylistDetails{}, err
+	}
+	return pl, nil
+}
+
+func (c *Client) UpdatePlaylistDetails(ctx context.Context, playlistID string, public *bool, name *string, description *string) error {
+	body := map[string]any{}
+	if public != nil {
+		body["public"] = *public
+	}
+	if name != nil {
+		body["name"] = *name
+	}
+	if description != nil {
+		body["description"] = *description
+	}
+	path := fmt.Sprintf("/v1/playlists/%s", url.PathEscape(playlistID))
+	return c.do(ctx, "PUT", path, nil, body, nil, 200, 202, 204)
 }
 
 type AddTracksResult struct {

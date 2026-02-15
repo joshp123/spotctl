@@ -56,6 +56,19 @@ func (c *cli) cmdPlaylistCreate(ctx context.Context, args []string, stdout, stde
 		return err
 	}
 
+	// Best-effort: enforce private-by-default. Some Spotify accounts appear to ignore the
+	// create-request "public" field and default to public.
+	if !*public {
+		priv := false
+		_ = c.client.UpdatePlaylistDetails(ctx, pl.ID, &priv, nil, nil)
+
+		if det, err := c.client.PlaylistDetails(ctx, pl.ID); err == nil {
+			if det.Public != nil && *det.Public {
+				fmt.Fprintln(stderr, "WARN: Spotify reports this playlist as public. If you want private-by-default, disable Spotify’s setting ‘Publish my new playlists’ (Settings → Social), or manually ‘Make secret’ in the client.")
+			}
+		}
+	}
+
 	if *jsonOut {
 		enc := json.NewEncoder(stdout)
 		enc.SetIndent("", "  ")
