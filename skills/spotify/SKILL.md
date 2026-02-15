@@ -103,6 +103,11 @@ Create playlist (private by default; pass `--public` to make it public):
 spotctl playlist create --name "My New Playlist" --description "made by OpenClaw" --json
 ```
 
+If Spotify creates it as public anyway (account quirks happen), use:
+```bash
+spotctl playlist privacy --playlist <playlist-id-or-uri> --private
+```
+
 Search for candidate tracks (for vibe-based playlists):
 ```bash
 spotctl search tracks "lofi focus beats" --limit 10 --json

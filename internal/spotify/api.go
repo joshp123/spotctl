@@ -201,8 +201,11 @@ func (c *Client) CreatePlaylist(ctx context.Context, name string, public bool, d
 
 func (c *Client) PlaylistDetails(ctx context.Context, playlistID string) (PlaylistDetails, error) {
 	path := fmt.Sprintf("/v1/playlists/%s", url.PathEscape(playlistID))
+	q := url.Values{}
+	// Reduce payload + rate limit pressure; enough to verify privacy.
+	q.Set("fields", "id,name,uri,public")
 	var pl PlaylistDetails
-	if err := c.do(ctx, "GET", path, nil, nil, &pl, 200); err != nil {
+	if err := c.do(ctx, "GET", path, q, nil, &pl, 200); err != nil {
 		return PlaylistDetails{}, err
 	}
 	return pl, nil

@@ -25,6 +25,8 @@ func (c *cli) cmdPlaylist(ctx context.Context, args []string, stdout, stderr io.
 		return c.cmdPlaylistCreate(ctx, args, stdout, stderr)
 	case "add":
 		return c.cmdPlaylistAdd(ctx, args, stdout, stderr)
+	case "privacy":
+		return c.cmdPlaylistPrivacy(ctx, args, stdout, stderr)
 	default:
 		return &exitError{code: 2, err: fmt.Errorf("unknown playlist subcommand: %s", sub)}
 	}
@@ -64,7 +66,7 @@ func (c *cli) cmdPlaylistCreate(ctx context.Context, args []string, stdout, stde
 
 		if det, err := c.client.PlaylistDetails(ctx, pl.ID); err == nil {
 			if det.Public != nil && *det.Public {
-				fmt.Fprintln(stderr, "WARN: Spotify reports this playlist as public. If you want private-by-default, disable Spotify’s setting ‘Publish my new playlists’ (Settings → Social), or manually ‘Make secret’ in the client.")
+				fmt.Fprintln(stderr, "WARN: Spotify reports this playlist as public. Note: the Spotify setting about ‘new playlists visible on your profile’ is separate from public/secret. To make it private/secret, use the playlist menu (⋯) → ‘Make secret’, or run: spotctl playlist privacy --playlist <id> --private")
 			}
 		}
 	}

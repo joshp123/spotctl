@@ -18,6 +18,12 @@ It also exports an **OpenClaw plugin** (`openclawPlugin` flake output) that prov
 
 Playlists created by `spotctl playlist create` are **private by default**. Use `--public` to create a public playlist.
 
+If Spotify creates it as public anyway, you can flip it:
+
+```bash
+spotctl playlist privacy --playlist <playlist-id-or-uri> --private
+```
+
 ## Quick smoke
 
 ```bash
