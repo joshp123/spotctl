@@ -108,14 +108,11 @@ func (c *cli) cmdPlaylistAdd(ctx context.Context, args []string, stdout, stderr 
 	}
 
 	// Validate tracks exist to prevent hallucinated URIs.
-	tracks, err := c.client.GetTracks(ctx, ids)
-	if err != nil {
-		return err
-	}
-	if len(tracks) != len(ids) {
-		return &exitError{code: 2, err: errors.New("some tracks could not be validated")}
-	}
-	for i, t := range tracks {
+	for i, id := range ids {
+		t, err := c.client.GetTrack(ctx, id)
+		if err != nil {
+			return err
+		}
 		if t.ID == "" {
 			return &exitError{code: 2, err: fmt.Errorf("invalid track uri (not found): %s", uris[i])}
 		}

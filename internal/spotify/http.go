@@ -7,8 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -80,6 +82,7 @@ func (c *Client) do(ctx context.Context, method, path string, q url.Values, body
 		bodyBytes = bb
 	}
 
+	debug := os.Getenv("SPOTCTL_DEBUG") != "" || os.Getenv("SPOTCTL_DEBUG_HTTP") != ""
 	try := func(forceRefresh bool) (*http.Response, []byte, error) {
 		var token string
 		var err error
@@ -111,6 +114,9 @@ func (c *Client) do(ctx context.Context, method, path string, q url.Values, body
 		}
 		bb, _ := ioReadAllLimit(resp.Body, 2<<20)
 		_ = resp.Body.Close()
+		if debug {
+			log.Printf("spotctl http: %s %s -> %d", method, u, resp.StatusCode)
+		}
 		return resp, bb, nil
 	}
 

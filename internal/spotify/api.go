@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/url"
-	"strings"
 )
 
 // Devices returns the full list of Spotify Connect devices visible to the user.
@@ -148,31 +147,15 @@ func (c *Client) SearchTopTrack(ctx context.Context, query string) (Track, error
 	return items[0], nil
 }
 
-func (c *Client) GetTracks(ctx context.Context, ids []string) ([]Track, error) {
-	if len(ids) == 0 {
-		return nil, nil
-	}
-	// max 50 ids
-	if len(ids) > 50 {
-		ids = ids[:50]
-	}
+func (c *Client) GetTrack(ctx context.Context, id string) (Track, error) {
 	q := url.Values{}
-	q.Set("ids", strings.Join(ids, ","))
-	var res struct {
-		Tracks []*Track `json:"tracks"`
+	q.Set("market", "from_token")
+	var t Track
+	path := fmt.Sprintf("/v1/tracks/%s", url.PathEscape(id))
+	if err := c.do(ctx, "GET", path, q, nil, &t, 200); err != nil {
+		return Track{}, err
 	}
-	if err := c.do(ctx, "GET", "/v1/tracks", q, nil, &res, 200); err != nil {
-		return nil, err
-	}
-	out := make([]Track, 0, len(res.Tracks))
-	for _, t := range res.Tracks {
-		if t == nil {
-			out = append(out, Track{})
-			continue
-		}
-		out = append(out, *t)
-	}
-	return out, nil
+	return t, nil
 }
 
 type User struct {
