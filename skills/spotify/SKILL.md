@@ -108,6 +108,10 @@ If Spotify creates it as public anyway (account quirks happen), use:
 spotctl playlist privacy --playlist <playlist-id-or-uri> --private
 ```
 
+If the API is rate-limited or privacy toggling fails, fallback:
+- create an empty **secret/private** playlist in the Spotify client
+- then use `spotctl playlist add --playlist <that-playlist> ...`
+
 Search for candidate tracks (for vibe-based playlists):
 ```bash
 spotctl search tracks "lofi focus beats" --limit 10 --json

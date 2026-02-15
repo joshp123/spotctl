@@ -24,6 +24,8 @@ If Spotify creates it as public anyway, you can flip it:
 spotctl playlist privacy --playlist <playlist-id-or-uri> --private
 ```
 
+Fallback (privacy-first): create the playlist as secret/private in the Spotify client, then add tracks with `spotctl playlist add`.
+
 ## Quick smoke
 
 ```bash
