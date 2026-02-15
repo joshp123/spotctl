@@ -35,8 +35,8 @@ func (c *cli) cmdSearchTracks(ctx context.Context, args []string, stdout, stderr
 	fs.SetOutput(io.Discard)
 	limit := fs.Int("limit", 10, "Max results (<=50)")
 	jsonOut := fs.Bool("json", false, "JSON output")
-	if err := fs.Parse(args); err != nil {
-		return &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return err
 	}
 	if jsonTrailing {
 		*jsonOut = true

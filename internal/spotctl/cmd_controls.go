@@ -13,7 +13,7 @@ func (c *cli) cmdPause(ctx context.Context, args []string, stdout, stderr io.Wri
 	if err := c.ensureClient(ctx); err != nil {
 		return err
 	}
-	deviceID, err := c.optionalDeviceArg(ctx, "pause", args)
+	deviceID, err := c.optionalDeviceArg(ctx, "pause", args, stderr)
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func (c *cli) cmdNext(ctx context.Context, args []string, stdout, stderr io.Writ
 	if err := c.ensureClient(ctx); err != nil {
 		return err
 	}
-	deviceID, err := c.optionalDeviceArg(ctx, "next", args)
+	deviceID, err := c.optionalDeviceArg(ctx, "next", args, stderr)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (c *cli) cmdPrevious(ctx context.Context, args []string, stdout, stderr io.
 	if err := c.ensureClient(ctx); err != nil {
 		return err
 	}
-	deviceID, err := c.optionalDeviceArg(ctx, "previous", args)
+	deviceID, err := c.optionalDeviceArg(ctx, "previous", args, stderr)
 	if err != nil {
 		return err
 	}
@@ -61,8 +61,8 @@ func (c *cli) cmdVolume(ctx context.Context, args []string, stdout, stderr io.Wr
 	fs := flag.NewFlagSet("volume", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	deviceSel := fs.String("device", "", "Device name or id")
-	if err := fs.Parse(args); err != nil {
-		return &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return err
 	}
 	if fs.NArg() != 1 {
 		return &exitError{code: 2, err: errors.New("volume requires one arg: 0-100")}
@@ -92,12 +92,12 @@ func (c *cli) cmdVolume(ctx context.Context, args []string, stdout, stderr io.Wr
 	return nil
 }
 
-func (c *cli) optionalDeviceArg(ctx context.Context, name string, args []string) (*string, error) {
+func (c *cli) optionalDeviceArg(ctx context.Context, name string, args []string, stderr io.Writer) (*string, error) {
 	fs := flag.NewFlagSet(name, flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	deviceSel := fs.String("device", "", "Optional device name or id")
-	if err := fs.Parse(args); err != nil {
-		return nil, &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return nil, err
 	}
 	if fs.NArg() != 0 {
 		return nil, &exitError{code: 2, err: fmt.Errorf("%s takes no positional args", name)}

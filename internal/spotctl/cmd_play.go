@@ -17,8 +17,8 @@ func (c *cli) cmdPlay(ctx context.Context, args []string, stdout, stderr io.Writ
 	fs := flag.NewFlagSet("play", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	deviceSel := fs.String("device", "", "Device name or id (strict)")
-	if err := fs.Parse(args); err != nil {
-		return &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return err
 	}
 	if *deviceSel == "" {
 		return &exitError{code: 2, err: errors.New("missing --device")}

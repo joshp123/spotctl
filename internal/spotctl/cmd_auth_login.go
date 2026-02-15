@@ -22,8 +22,8 @@ func (c *cli) cmdAuthLogin(ctx context.Context, args []string, stdout, stderr io
 	scopes := fs.String("scopes", strings.Join(defaultScopes, " "), "Space-separated scopes")
 	showDialog := fs.Bool("show-dialog", true, "Force auth dialog")
 	noOpen := fs.Bool("no-open", false, "Do not auto-open browser; print URL only")
-	if err := fs.Parse(args); err != nil {
-		return &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return err
 	}
 	if *redirectURI == "" {
 		return &exitError{code: 2, err: errors.New("missing --redirect-uri")}

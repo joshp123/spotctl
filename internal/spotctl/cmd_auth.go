@@ -48,8 +48,8 @@ func (c *cli) cmdAuthURL(ctx context.Context, args []string, stdout, stderr io.W
 	redirectURI := fs.String("redirect-uri", "", "Redirect URI (must match Spotify app settings)")
 	scopes := fs.String("scopes", strings.Join(defaultScopes, " "), "Space-separated scopes")
 	showDialog := fs.Bool("show-dialog", true, "Force auth dialog")
-	if err := fs.Parse(args); err != nil {
-		return &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return err
 	}
 	if *redirectURI == "" {
 		return &exitError{code: 2, err: errors.New("missing --redirect-uri")}
@@ -78,8 +78,8 @@ func (c *cli) cmdAuthExchange(ctx context.Context, args []string, stdout, stderr
 	redirectURI := fs.String("redirect-uri", "", "Redirect URI")
 	code := fs.String("code", "", "Authorization code")
 	redirectURL := fs.String("redirect-url", "", "Full redirect URL (paste from browser address bar)")
-	if err := fs.Parse(args); err != nil {
-		return &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return err
 	}
 	if *redirectURI == "" {
 		return &exitError{code: 2, err: errors.New("missing --redirect-uri")}

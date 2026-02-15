@@ -92,7 +92,7 @@ $SPOTCTL status --json | jq '.active' >/dev/null || fail "status"
 pass "status"
 
 echo "== playlist create+add =="
-pid=$($SPOTCTL playlist create --name "spotctl-smoke-$(date +%Y%m%d-%H%M%S)" --description "spotctl smoke" --json | jq -r .id)
+pid=$($SPOTCTL playlist create --name "spotctl-test:smoke:$(date +%Y%m%d-%H%M%S)" --description "spotctl smoke" --json | jq -r .id)
 if [ -z "$pid" ] || [ "$pid" = "null" ]; then
   fail "playlist create"
 fi

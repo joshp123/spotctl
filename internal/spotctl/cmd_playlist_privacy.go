@@ -19,8 +19,8 @@ func (c *cli) cmdPlaylistPrivacy(ctx context.Context, args []string, stdout, std
 	makePublic := fs.Bool("public", false, "Make playlist public")
 	makePrivate := fs.Bool("private", false, "Make playlist private/secret")
 	jsonOut := fs.Bool("json", false, "JSON output")
-	if err := fs.Parse(args); err != nil {
-		return &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return err
 	}
 	if jsonTrailing {
 		*jsonOut = true

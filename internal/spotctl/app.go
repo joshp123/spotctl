@@ -138,6 +138,8 @@ Usage:
 
   spotctl playlist create --name <name> [--public] [--description <text>] [--json]
   spotctl playlist add --playlist <id|uri|url> <track-uri...> [--json]
+  spotctl playlist privacy --playlist <id|uri|url> (--private|--public) [--json]
+  spotctl playlist cleanup [--prefix spotctl-test:] [--regex <re>] [--apply --yes] [--json]
 
   spotctl auth url --redirect-uri <uri>
   spotctl auth exchange --redirect-uri <uri> (--code <code> | --redirect-url <full-url>)

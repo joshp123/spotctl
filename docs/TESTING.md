@@ -18,6 +18,14 @@ From repo root:
 ./scripts/smoke.sh
 ```
 
+Smoke creates a test playlist named:
+- `spotctl-test:smoke:<YYYYMMDD-HHMMSS>`
+
+Cleanup:
+```bash
+spotctl playlist cleanup --prefix spotctl-test: --apply --yes
+```
+
 Optional:
 - `SPOTCTL_BIN=...` to force a specific binary
 - `SPOTCTL_DEVICE=...` to force device selection (name or id)

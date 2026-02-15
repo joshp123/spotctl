@@ -27,6 +27,8 @@ func (c *cli) cmdPlaylist(ctx context.Context, args []string, stdout, stderr io.
 		return c.cmdPlaylistAdd(ctx, args, stdout, stderr)
 	case "privacy":
 		return c.cmdPlaylistPrivacy(ctx, args, stdout, stderr)
+	case "cleanup":
+		return c.cmdPlaylistCleanup(ctx, args, stdout, stderr)
 	default:
 		return &exitError{code: 2, err: fmt.Errorf("unknown playlist subcommand: %s", sub)}
 	}
@@ -40,8 +42,8 @@ func (c *cli) cmdPlaylistCreate(ctx context.Context, args []string, stdout, stde
 	public := fs.Bool("public", false, "Create as public")
 	desc := fs.String("description", "", "Playlist description")
 	jsonOut := fs.Bool("json", false, "JSON output")
-	if err := fs.Parse(args); err != nil {
-		return &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return err
 	}
 	if jsonTrailing {
 		*jsonOut = true
@@ -86,8 +88,8 @@ func (c *cli) cmdPlaylistAdd(ctx context.Context, args []string, stdout, stderr 
 	fs.SetOutput(io.Discard)
 	playlistSel := fs.String("playlist", "", "Playlist id/uri/url")
 	jsonOut := fs.Bool("json", false, "JSON output")
-	if err := fs.Parse(args); err != nil {
-		return &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return err
 	}
 	if jsonTrailing {
 		*jsonOut = true

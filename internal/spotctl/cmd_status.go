@@ -28,8 +28,8 @@ func (c *cli) cmdStatus(ctx context.Context, args []string, stdout, stderr io.Wr
 	fs := flag.NewFlagSet("status", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	jsonOut := fs.Bool("json", false, "JSON output")
-	if err := fs.Parse(args); err != nil {
-		return &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return err
 	}
 	if jsonTrailing {
 		*jsonOut = true

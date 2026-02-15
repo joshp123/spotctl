@@ -23,8 +23,8 @@ func (c *cli) cmdAuthBootstrapAgenix(ctx context.Context, args []string, stdout,
 	fs.SetOutput(io.Discard)
 	secretsDir := fs.String("secrets-dir", "", "Path to nix-secrets directory (contains secrets.nix)")
 	redirectURI := fs.String("redirect-uri", "", "Redirect URI (must match Spotify app settings). Recommended: http://localhost:8899/callback")
-	if err := fs.Parse(args); err != nil {
-		return &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return err
 	}
 	if *secretsDir == "" {
 		return &exitError{code: 2, err: errors.New("missing --secrets-dir")}

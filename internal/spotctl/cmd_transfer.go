@@ -16,8 +16,8 @@ func (c *cli) cmdTransfer(ctx context.Context, args []string, stdout, stderr io.
 	fs.SetOutput(io.Discard)
 	deviceSel := fs.String("device", "", "Device name or id (strict)")
 	play := fs.Bool("play", true, "Start playback after transfer")
-	if err := fs.Parse(args); err != nil {
-		return &exitError{code: 2, err: err}
+	if err := parseFlags(fs, args, stderr); err != nil {
+		return err
 	}
 	if *deviceSel == "" {
 		return &exitError{code: 2, err: errors.New("missing --device")}
