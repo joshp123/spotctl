@@ -114,7 +114,10 @@ func (c *Client) do(ctx context.Context, method, path string, q url.Values, body
 		return resp, bb, nil
 	}
 
-	// Retry policy: 401 -> refresh and retry once; 429 -> wait and retry once.
+	// Retry policy:
+	// - 401 -> refresh and retry once
+	// - 429 -> wait Retry-After and retry once
+	// - 5xx -> small backoff and retry twice
 	resp, bb, err := try(false)
 	if err != nil {
 		return err
@@ -139,6 +142,18 @@ func (c *Client) do(ctx context.Context, method, path string, q url.Values, body
 					return err
 				}
 			}
+		}
+	}
+	for attempt := 0; attempt < 2 && resp.StatusCode >= 500 && resp.StatusCode <= 599; attempt++ {
+		d := time.Duration(attempt+1) * time.Second
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(d):
+		}
+		resp, bb, err = try(false)
+		if err != nil {
+			return err
 		}
 	}
 
