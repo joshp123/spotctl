@@ -35,6 +35,10 @@ func (c *cli) cmdPlaylistPrivacy(ctx context.Context, args []string, stdout, std
 		return &exitError{code: 2, err: errors.New("playlist privacy takes no positional args")}
 	}
 
+	if err := c.ensureClient(ctx); err != nil {
+		return err
+	}
+
 	pid, err := spotify.NormalizePlaylistID(*playlistSel)
 	if err != nil {
 		return &exitError{code: 2, err: err}

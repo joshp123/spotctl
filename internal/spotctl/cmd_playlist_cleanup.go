@@ -60,6 +60,10 @@ func (c *cli) cmdPlaylistCleanup(ctx context.Context, args []string, stdout, std
 		}
 	}
 
+	if err := c.ensureClient(ctx); err != nil {
+		return err
+	}
+
 	pls, err := c.client.MyPlaylists(ctx)
 	if err != nil {
 		return err

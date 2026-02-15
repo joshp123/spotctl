@@ -12,9 +12,6 @@ import (
 )
 
 func (c *cli) cmdPlaylist(ctx context.Context, args []string, stdout, stderr io.Writer) error {
-	if err := c.ensureClient(ctx); err != nil {
-		return err
-	}
 	if len(args) == 0 {
 		return &exitError{code: 2, err: errors.New("missing subcommand for playlist")}
 	}
@@ -53,6 +50,10 @@ func (c *cli) cmdPlaylistCreate(ctx context.Context, args []string, stdout, stde
 	}
 	if fs.NArg() != 0 {
 		return &exitError{code: 2, err: errors.New("playlist create takes no positional args")}
+	}
+
+	if err := c.ensureClient(ctx); err != nil {
+		return err
 	}
 
 	pl, err := c.client.CreatePlaylist(ctx, *name, *public, *desc)
@@ -99,6 +100,10 @@ func (c *cli) cmdPlaylistAdd(ctx context.Context, args []string, stdout, stderr 
 	}
 	if fs.NArg() == 0 {
 		return &exitError{code: 2, err: errors.New("playlist add requires at least one track URI")}
+	}
+
+	if err := c.ensureClient(ctx); err != nil {
+		return err
 	}
 
 	pid, err := spotify.NormalizePlaylistID(*playlistSel)

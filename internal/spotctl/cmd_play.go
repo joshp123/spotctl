@@ -11,9 +11,6 @@ import (
 )
 
 func (c *cli) cmdPlay(ctx context.Context, args []string, stdout, stderr io.Writer) error {
-	if err := c.ensureClient(ctx); err != nil {
-		return err
-	}
 	fs := flag.NewFlagSet("play", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	deviceSel := fs.String("device", "", "Device name or id (strict)")
@@ -27,6 +24,10 @@ func (c *cli) cmdPlay(ctx context.Context, args []string, stdout, stderr io.Writ
 		return &exitError{code: 2, err: errors.New("play requires exactly one argument: spotify URI or search query")}
 	}
 	q := fs.Arg(0)
+
+	if err := c.ensureClient(ctx); err != nil {
+		return err
+	}
 
 	dev, devs, err := c.client.ResolveDevice(ctx, *deviceSel)
 	if err != nil {

@@ -9,9 +9,6 @@ import (
 )
 
 func (c *cli) cmdTransfer(ctx context.Context, args []string, stdout, stderr io.Writer) error {
-	if err := c.ensureClient(ctx); err != nil {
-		return err
-	}
 	fs := flag.NewFlagSet("transfer", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	deviceSel := fs.String("device", "", "Device name or id (strict)")
@@ -24,6 +21,10 @@ func (c *cli) cmdTransfer(ctx context.Context, args []string, stdout, stderr io.
 	}
 	if fs.NArg() != 0 {
 		return &exitError{code: 2, err: errors.New("transfer takes no positional args")}
+	}
+
+	if err := c.ensureClient(ctx); err != nil {
+		return err
 	}
 
 	dev, devs, err := c.client.ResolveDevice(ctx, *deviceSel)

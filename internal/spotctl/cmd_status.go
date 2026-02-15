@@ -21,9 +21,6 @@ type statusOutput struct {
 }
 
 func (c *cli) cmdStatus(ctx context.Context, args []string, stdout, stderr io.Writer) error {
-	if err := c.ensureClient(ctx); err != nil {
-		return err
-	}
 	jsonTrailing, args := popBoolFlag(args, "--json")
 	fs := flag.NewFlagSet("status", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
@@ -36,6 +33,10 @@ func (c *cli) cmdStatus(ctx context.Context, args []string, stdout, stderr io.Wr
 	}
 	if fs.NArg() != 0 {
 		return &exitError{code: 2, err: errors.New("status takes no positional args")}
+	}
+
+	if err := c.ensureClient(ctx); err != nil {
+		return err
 	}
 
 	st, err := c.client.PlaybackState(ctx)

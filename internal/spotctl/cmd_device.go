@@ -25,9 +25,6 @@ func (c *cli) cmdDevice(ctx context.Context, args []string, stdout, stderr io.Wr
 }
 
 func (c *cli) cmdDeviceList(ctx context.Context, args []string, stdout, stderr io.Writer) error {
-	if err := c.ensureClient(ctx); err != nil {
-		return err
-	}
 	jsonTrailing, args := popBoolFlag(args, "--json")
 	fs := flag.NewFlagSet("device list", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
@@ -37,6 +34,10 @@ func (c *cli) cmdDeviceList(ctx context.Context, args []string, stdout, stderr i
 	}
 	if jsonTrailing {
 		*jsonOut = true
+	}
+
+	if err := c.ensureClient(ctx); err != nil {
+		return err
 	}
 
 	devs, err := c.client.Devices(ctx)

@@ -13,9 +13,6 @@ import (
 )
 
 func (c *cli) cmdSearch(ctx context.Context, args []string, stdout, stderr io.Writer) error {
-	if err := c.ensureClient(ctx); err != nil {
-		return err
-	}
 	if len(args) == 0 {
 		return &exitError{code: 2, err: errors.New("missing subcommand for search")}
 	}
@@ -45,6 +42,10 @@ func (c *cli) cmdSearchTracks(ctx context.Context, args []string, stdout, stderr
 		return &exitError{code: 2, err: errors.New("search requires a query")}
 	}
 	query := strings.Join(fs.Args(), " ")
+
+	if err := c.ensureClient(ctx); err != nil {
+		return err
+	}
 
 	items, err := c.client.SearchTracks(ctx, query, *limit)
 	if err != nil {
