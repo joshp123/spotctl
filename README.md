@@ -14,6 +14,10 @@ It also exports an **OpenClaw plugin** (`openclawPlugin` flake output) that prov
 - `SPOTIFY_CLIENT_SECRET`
 - `SPOTIFY_REFRESH_TOKEN`
 
+## Playlist privacy
+
+Playlists created by `spotctl playlist create` are **private by default**. Use `--public` to create a public playlist.
+
 ## Quick smoke
 
 ```bash

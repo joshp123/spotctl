@@ -98,7 +98,7 @@ Notes:
 
 ### Playlist ops (minimal v1)
 
-Create playlist:
+Create playlist (private by default; pass `--public` to make it public):
 ```bash
 spotctl playlist create --name "My New Playlist" --description "made by OpenClaw" --json
 ```
