@@ -89,6 +89,11 @@ spotctl previous --device "Josh’s iPhone"
 spotctl volume --device "Josh’s iPhone" 35
 ```
 
+Notes:
+- Spotify may refuse some commands depending on device/context.
+  - iPhone volume often fails (“Cannot control device volume”). Tell user to adjust volume on-device.
+  - previous/next/pause can fail (“Restriction violated”). Suggest switching to Desktop or starting playback in-app first.
+
 ### Playlist ops (minimal v1)
 
 Create playlist:
@@ -99,8 +104,10 @@ spotctl playlist create --name "My New Playlist" --description "made by OpenClaw
 Add tracks (URIs only in v1):
 ```bash
 spotctl playlist add --playlist spotify:playlist:37i9dQZF1DXcBWIGoYBM5M \
-  spotify:track:3n3Ppam7vgaVa1iaRUc9Lp spotify:track:7ouMYWpwJ422jRcDASZB7P
+  spotify:track:3n3Ppam7vgaVa1iaRUc9Lp spotify:track:7ouMYWpwJ422jRcDASZB7P --json
 ```
+
+Tip: `--json` can be at the end (agent-friendly).
 
 ## Strict device failure message
 

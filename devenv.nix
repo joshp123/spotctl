@@ -3,6 +3,7 @@
   packages = with pkgs; [
     go
     gopls
+    jq
   ];
 
   scripts.test.exec = ''
@@ -20,7 +21,11 @@
     go test ./...
   '';
 
+  scripts.smoke.exec = ''
+    ./scripts/smoke.sh
+  '';
+
   enterShell = ''
-    echo "devenv: try: devenv shell -- test | devenv shell -- build"
+    echo "devenv: try: devenv shell -- test | devenv shell -- build | devenv shell -- smoke"
   '';
 }
