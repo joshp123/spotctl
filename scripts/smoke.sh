@@ -43,7 +43,8 @@ warn() { echo "WARN: $*"; }
 fail() { echo "FAIL: $*"; exit 1; }
 
 run_hard() {
-  local name=$1; shift
+  local name=$1
+  shift
   if $SPOTCTL "$@" >/dev/null; then
     pass "$name"
   else
@@ -52,7 +53,8 @@ run_hard() {
 }
 
 run_soft() {
-  local name=$1; shift
+  local name=$1
+  shift
   if out=$($SPOTCTL "$@" 2>&1); then
     pass "$name"
   else
@@ -62,6 +64,12 @@ run_soft() {
 
 echo "== device list =="
 devs_json=$($SPOTCTL device list --json)
+# If Spotify devices are asleep, the API can report none.
+# Retry once after a short pause.
+if [ "$(echo "$devs_json" | jq -r '.devices | length')" = "0" ]; then
+  sleep 2
+  devs_json=$($SPOTCTL device list --json)
+fi
 echo "$devs_json" | jq '.devices | length' >/dev/null || fail "device list json"
 pass "device list"
 
@@ -90,6 +98,10 @@ if [ -z "$pid" ] || [ "$pid" = "null" ]; then
 fi
 pass "playlist create"
 run_hard "playlist add" playlist add --playlist "$pid" spotify:track:3n3Ppam7vgaVa1iaRUc9Lp --json
+
+# search (sanity; also used to avoid hallucinated URIs)
+$SPOTCTL search tracks "mr brightside the killers" --limit 3 --json | jq -r '.items[0].uri' >/dev/null || fail "search tracks"
+pass "search tracks"
 
 # playback (soft because spotify restrictions vary)
 echo "== playback controls (soft) =="

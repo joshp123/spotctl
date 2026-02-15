@@ -20,12 +20,13 @@ type PlaybackState struct {
 }
 
 type Track struct {
-	ID      string   `json:"id"`
-	Name    string   `json:"name"`
-	URI     string   `json:"uri"`
-	Type    string   `json:"type"`
-	Album   Album    `json:"album"`
-	Artists []Artist `json:"artists"`
+	ID         string   `json:"id"`
+	Name       string   `json:"name"`
+	URI        string   `json:"uri"`
+	Type       string   `json:"type"`
+	DurationMs int      `json:"duration_ms"`
+	Album      Album    `json:"album"`
+	Artists    []Artist `json:"artists"`
 }
 
 type Album struct {

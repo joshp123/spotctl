@@ -90,6 +90,7 @@ func (c *cli) cmdPlaylistAdd(ctx context.Context, args []string, stdout, stderr 
 	}
 
 	uris := make([]string, 0, fs.NArg())
+	ids := make([]string, 0, fs.NArg())
 	for _, a := range fs.Args() {
 		uri, kind, err := spotify.NormalizeURI(a)
 		if err != nil {
@@ -98,7 +99,26 @@ func (c *cli) cmdPlaylistAdd(ctx context.Context, args []string, stdout, stderr 
 		if kind != spotify.URIKindTrack {
 			return &exitError{code: 2, err: fmt.Errorf("playlist add only supports track URIs in v1: %s", a)}
 		}
+		id, err := spotify.TrackIDFromURI(uri)
+		if err != nil {
+			return &exitError{code: 2, err: err}
+		}
 		uris = append(uris, uri)
+		ids = append(ids, id)
+	}
+
+	// Validate tracks exist to prevent hallucinated URIs.
+	tracks, err := c.client.GetTracks(ctx, ids)
+	if err != nil {
+		return err
+	}
+	if len(tracks) != len(ids) {
+		return &exitError{code: 2, err: errors.New("some tracks could not be validated")}
+	}
+	for i, t := range tracks {
+		if t.ID == "" {
+			return &exitError{code: 2, err: fmt.Errorf("invalid track uri (not found): %s", uris[i])}
+		}
 	}
 
 	res, err := c.client.AddTracksToPlaylist(ctx, pid, uris)

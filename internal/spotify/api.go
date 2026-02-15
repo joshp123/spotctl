@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 // Devices returns the full list of Spotify Connect devices visible to the user.
@@ -114,23 +115,64 @@ func (c *Client) Volume(ctx context.Context, deviceID *string, pct int) error {
 	return c.do(ctx, "PUT", "/v1/me/player/volume", q, nil, nil, 200, 202, 204)
 }
 
-func (c *Client) SearchTopTrack(ctx context.Context, query string) (Track, error) {
+func (c *Client) SearchTracks(ctx context.Context, query string, limit int) ([]Track, error) {
+	if limit <= 0 {
+		limit = 10
+	}
+	if limit > 50 {
+		limit = 50
+	}
 	q := url.Values{}
 	q.Set("q", query)
 	q.Set("type", "track")
-	q.Set("limit", "1")
+	q.Set("limit", fmt.Sprintf("%d", limit))
 	var res struct {
 		Tracks struct {
 			Items []Track `json:"items"`
 		} `json:"tracks"`
 	}
 	if err := c.do(ctx, "GET", "/v1/search", q, nil, &res, 200); err != nil {
+		return nil, err
+	}
+	return res.Tracks.Items, nil
+}
+
+func (c *Client) SearchTopTrack(ctx context.Context, query string) (Track, error) {
+	items, err := c.SearchTracks(ctx, query, 1)
+	if err != nil {
 		return Track{}, err
 	}
-	if len(res.Tracks.Items) == 0 {
+	if len(items) == 0 {
 		return Track{}, fmt.Errorf("no search results for %q", query)
 	}
-	return res.Tracks.Items[0], nil
+	return items[0], nil
+}
+
+func (c *Client) GetTracks(ctx context.Context, ids []string) ([]Track, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	// max 50 ids
+	if len(ids) > 50 {
+		ids = ids[:50]
+	}
+	q := url.Values{}
+	q.Set("ids", strings.Join(ids, ","))
+	var res struct {
+		Tracks []*Track `json:"tracks"`
+	}
+	if err := c.do(ctx, "GET", "/v1/tracks", q, nil, &res, 200); err != nil {
+		return nil, err
+	}
+	out := make([]Track, 0, len(res.Tracks))
+	for _, t := range res.Tracks {
+		if t == nil {
+			out = append(out, Track{})
+			continue
+		}
+		out = append(out, *t)
+	}
+	return out, nil
 }
 
 type User struct {

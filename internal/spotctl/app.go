@@ -77,6 +77,8 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 		return cli.cmdVolume(ctx, args, stdout, stderr)
 	case "playlist":
 		return cli.cmdPlaylist(ctx, args, stdout, stderr)
+	case "search":
+		return cli.cmdSearch(ctx, args, stdout, stderr)
 	case "auth":
 		return cli.cmdAuth(ctx, args, stdout, stderr)
 	default:
@@ -128,6 +130,7 @@ Usage:
   spotctl status [--json]
   spotctl transfer --device <name|id>
   spotctl play --device <name|id> <spotify-uri-or-search>
+  spotctl search tracks <query> [--limit N] [--json]
   spotctl pause [--device <name|id>]
   spotctl next [--device <name|id>]
   spotctl previous [--device <name|id>]

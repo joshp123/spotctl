@@ -11,8 +11,10 @@ Use `spotctl` for Spotify playback, device targeting, and minimal playlist opera
 
 - **Device targeting is strict.** If the requested device isn't available in `spotctl device list`, do **not** guess.
   - Tell the user: **"Open Spotify on that device, then retry."**
-- Prefer Spotify **URIs** (`spotify:track:...`, `spotify:playlist:...`).
-- Search is allowed, but treat it as “best effort” and report what was chosen.
+- **Never invent Spotify URLs/URIs.**
+  - If you need a track URI from text, use `spotctl search tracks ... --json` and copy the returned `uri`.
+  - `spotctl playlist add` validates track URIs exist (prevents hallucinated IDs).
+- Prefer Spotify **URIs** (`spotify:track:...`, `spotify:playlist:...`) or `open.spotify.com/...` links.
 
 ## Auth / env
 
@@ -101,7 +103,12 @@ Create playlist:
 spotctl playlist create --name "My New Playlist" --description "made by OpenClaw" --json
 ```
 
-Add tracks (URIs only in v1):
+Search for candidate tracks (for vibe-based playlists):
+```bash
+spotctl search tracks "lofi focus beats" --limit 10 --json
+```
+
+Add tracks (URIs only in v1; use URIs returned by search):
 ```bash
 spotctl playlist add --playlist spotify:playlist:37i9dQZF1DXcBWIGoYBM5M \
   spotify:track:3n3Ppam7vgaVa1iaRUc9Lp spotify:track:7ouMYWpwJ422jRcDASZB7P --json
