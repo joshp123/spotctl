@@ -138,6 +138,15 @@ func (c *Client) do(ctx context.Context, method, path string, q url.Values, body
 		ra := resp.Header.Get("Retry-After")
 		if ra != "" {
 			if secs, err := strconv.Atoi(strings.TrimSpace(ra)); err == nil && secs > 0 {
+				maxWait := 15
+				if s := strings.TrimSpace(os.Getenv("SPOTCTL_MAX_RETRY_AFTER_SECS")); s != "" {
+					if v, err := strconv.Atoi(s); err == nil && v > 0 {
+						maxWait = v
+					}
+				}
+				if secs > maxWait {
+					return &APIError{StatusCode: 429, Message: fmt.Sprintf("rate limited (Retry-After=%ds); wait then retry", secs), Body: strings.TrimSpace(string(bb))}
+				}
 				select {
 				case <-ctx.Done():
 					return ctx.Err()
