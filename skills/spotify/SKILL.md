@@ -103,6 +103,11 @@ Create playlist (private by default; pass `--public` to make it public):
 spotctl playlist create --name "My New Playlist" --description "made by OpenClaw" --json
 ```
 
+Unix-friendly: print just the playlist URI (no JSON parsing):
+```bash
+spotctl playlist create --name "My New Playlist" --description "made by OpenClaw" --print uri
+```
+
 If Spotify creates it as public anyway (account quirks happen), use:
 ```bash
 spotctl playlist privacy --playlist <playlist-id-or-uri> --private
@@ -121,6 +126,19 @@ Add tracks (URIs only in v1; use URIs returned by search):
 ```bash
 spotctl playlist add --playlist spotify:playlist:37i9dQZF1DXcBWIGoYBM5M \
   spotify:track:3n3Ppam7vgaVa1iaRUc9Lp spotify:track:7ouMYWpwJ422jRcDASZB7P --json
+```
+
+Add tracks from search queries (no URIs needed):
+```bash
+spotctl playlist add-query --playlist spotify:playlist:... "daft punk one more time" "burial archangel" --json
+```
+
+Pipe TSV queries (artist<TAB>track) from another tool (no jq needed):
+```bash
+# input example:
+#   Radiohead\tParanoid Android
+#   Burial\tArchangel
+cat queries.tsv | spotctl playlist add-query --playlist spotify:playlist:... --stdin --tsv --json
 ```
 
 Tip: `--json` can be at the end (agent-friendly).

@@ -22,6 +22,8 @@ func (c *cli) cmdPlaylist(ctx context.Context, args []string, stdout, stderr io.
 		return c.cmdPlaylistCreate(ctx, args, stdout, stderr)
 	case "add":
 		return c.cmdPlaylistAdd(ctx, args, stdout, stderr)
+	case "add-query", "addquery":
+		return c.cmdPlaylistAddQuery(ctx, args, stdout, stderr)
 	case "privacy":
 		return c.cmdPlaylistPrivacy(ctx, args, stdout, stderr)
 	case "cleanup":
@@ -38,6 +40,7 @@ func (c *cli) cmdPlaylistCreate(ctx context.Context, args []string, stdout, stde
 	name := fs.String("name", "", "Playlist name")
 	public := fs.Bool("public", false, "Create as public")
 	desc := fs.String("description", "", "Playlist description")
+	printField := fs.String("print", "", "Print a single field: id|uri")
 	jsonOut := fs.Bool("json", false, "JSON output")
 	if err := parseFlags(fs, args, stderr); err != nil {
 		return err
@@ -47,6 +50,9 @@ func (c *cli) cmdPlaylistCreate(ctx context.Context, args []string, stdout, stde
 	}
 	if *name == "" {
 		return &exitError{code: 2, err: errors.New("missing --name")}
+	}
+	if *jsonOut && *printField != "" {
+		return &exitError{code: 2, err: errors.New("--json and --print are mutually exclusive")}
 	}
 	if fs.NArg() != 0 {
 		return &exitError{code: 2, err: errors.New("playlist create takes no positional args")}
@@ -78,6 +84,18 @@ func (c *cli) cmdPlaylistCreate(ctx context.Context, args []string, stdout, stde
 		enc := json.NewEncoder(stdout)
 		enc.SetIndent("", "  ")
 		return enc.Encode(pl)
+	}
+	if *printField != "" {
+		switch *printField {
+		case "id":
+			fmt.Fprintln(stdout, pl.ID)
+			return nil
+		case "uri":
+			fmt.Fprintln(stdout, pl.URI)
+			return nil
+		default:
+			return &exitError{code: 2, err: fmt.Errorf("invalid --print: %s (expected id|uri)", *printField)}
+		}
 	}
 	fmt.Fprintf(stdout, "Created playlist: %s (%s)\n", pl.Name, pl.URI)
 	return nil
